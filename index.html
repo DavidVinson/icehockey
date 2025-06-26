@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hockey Rink Ice Depth Heat Map</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hockey Rink Ice Depth Heat Map</h1>
+            <p>Visualize ice depth measurements across a 200' x 85' hockey rink</p>
+        </header>
+
+        <main>
+            <!-- Loading Spinner Section -->
+            <section class="loading-section" id="loadingSection" style="display: none;">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <h3>Processing Data...</h3>
+                    <p id="loadingMessage">Loading ice depth measurements...</p>
+                </div>
+            </section>
+
+            <!-- File Indicator Section -->
+            <section class="file-indicator" id="fileIndicator" style="display: none;">
+                <div class="file-info-card">
+                    <div class="file-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <h4 id="currentFileName">No file selected</h4>
+                        <p id="fileStats">Please upload a CSV file to begin</p>
+                    </div>
+                    <div class="file-status">
+                        <span class="status-badge" id="fileStatus">Ready</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <h3>Upload Ice Depth Data</h3>
+                        <p>Drag and drop your CSV file here or click to browse</p>
+                        <p class="file-info">Select a CSV file with x-axis, y-axis, and measurement columns</p>
+                        <input type="file" id="fileInput" accept=".csv" style="display: none;">
+                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="controls-section" id="controlsSection" style="display: none;">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="xColumn">X-Axis (Rink Length):</label>
+                        <select id="xColumn"></select>
+                    </div>
+                    <div class="control-group">
+                        <label for="yColumn">Y-Axis (Rink Width):</label>
+                        <select id="yColumn"></select>
+                    </div>
+                    <div class="control-group">
+                        <label for="valueColumn">Ice Depth (inches):</label>
+                        <select id="valueColumn"></select>
+                    </div>
+                </div>
+                <div class="color-info">
+                    <h4>Color Scheme:</h4>
+                    <ul>
+                        <li><span style="color: #ff0000;">🔴 Red</span> - Above sheet average (> +0.25")</li>
+                        <li><span style="color: #ffffff; background: #ccc; padding: 2px 4px; border-radius: 2px;">⚪ White</span> - Neutral (±0.25" from average)</li>
+                        <li><span style="color: #0000ff;">🔵 Blue</span> - Below sheet average (< -0.25")</li>
+                    </ul>
+                </div>
+                <button class="generate-btn" id="generateBtn">Generate Ice Depth Heat Map</button>
+            </section>
+
+            <section class="visualization-section" id="visualizationSection" style="display: none;">
+                <div class="chart-container">
+                    <canvas id="heatMapChart"></canvas>
+                </div>
+                <div class="legend" id="legend"></div>
+            </section>
+
+            <section class="data-preview" id="dataPreview" style="display: none;">
+                <h3>Measurement Data Preview</h3>
+                <div class="table-container">
+                    <table id="previewTable"></table>
+                </div>
+            </section>
+
+            <!-- Debug Information -->
+            <section class="debug-section" id="debugSection" style="display: none; background: #f0f0f0; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3>Debug Information</h3>
+                <div id="debugInfo"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
