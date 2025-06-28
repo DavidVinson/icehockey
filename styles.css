@@ -109,6 +109,47 @@ main {
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
 }
 
+/* Download button centering */
+.download-btn {
+    display: block;
+    margin: 20px auto 0 auto;
+}
+
+/* Toggle preview button */
+.toggle-preview-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    margin-top: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.toggle-preview-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.toggle-preview-btn.collapsed {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.toggle-preview-btn.collapsed:hover {
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Hidden rows styling */
+.hidden-row {
+    display: none;
+}
+
 .controls-section {
     margin-bottom: 40px;
     padding: 30px;
