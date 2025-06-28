@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hockey Rink Ice Depth Heat Map</title>
+    <title>Hockey Rink Ice Depth Heat Map Visualizer</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.29.1/plotly.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -38,7 +39,7 @@
                     </div>
                     <div class="file-details">
                         <h4 id="currentFileName">No file selected</h4>
-                        <p id="fileStats">Please upload a CSV file to begin</p>
+                        <p id="fileStats">Please upload a CSV or Excel file to begin</p>
                     </div>
                     <div class="file-status">
                         <span class="status-badge" id="fileStatus">Ready</span>
@@ -55,10 +56,10 @@
                             <line x1="12" y1="15" x2="12" y2="3"></line>
                         </svg>
                         <h3>Upload Ice Depth Data</h3>
-                        <p>Drag and drop your CSV file here or click to browse</p>
-                        <p class="file-info">Select a CSV file with x-axis, y-axis, and measurement columns</p>
-                        <input type="file" id="fileInput" accept=".csv" style="display: none;">
-                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        <p>Drag and drop your CSV or Excel file here or click to browse</p>
+                        <p class="file-info">Select a CSV or Excel file (.xlsx, .xls) with x-axis, y-axis, and measurement columns</p>
+                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;">
+                        <button class="upload-btn">
                             Choose File
                         </button>
                     </div>
@@ -93,7 +94,7 @@
 
             <section class="visualization-section" id="visualizationSection" style="display: none;">
                 <div class="chart-container">
-                    <canvas id="heatMapChart"></canvas>
+                    <div id="heatMapChart"></div>
                 </div>
                 <div class="legend" id="legend"></div>
             </section>
