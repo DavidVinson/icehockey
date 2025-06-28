@@ -4,7 +4,8 @@ let heatMapChart = null;
 let sheetAverage = 0;
 let currentData = null;
 let heatMapPoints = []; // Make this global so tooltip callbacks can access it
-let csvFileName = null; // Store the CSV file name
+let csvFileName = '';
+let fileDate = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,9 +18,78 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     initializeEventListeners();
+    initializeTitleAndDate();
     // Show file indicator with ready state
     showFileIndicator('No file selected', 'Please upload a CSV file to begin', 'ready');
+    showDebugInfo({
+        csvData: false,
+        sheetAverage: null,
+        dataPoints: 0,
+        heatMapPoints: 0,
+        chartCreated: false,
+        plotlyVersion: typeof Plotly !== 'undefined' ? Plotly.version : 'Not loaded'
+    });
 });
+
+function initializeTitleAndDate() {
+    // Set default title
+    document.getElementById('customTitle').value = 'Hockey Rink Ice Depth Analysis';
+    
+    // Add event listener for update button
+    document.getElementById('updateTitleBtn').addEventListener('click', updatePageTitle);
+    
+    // Add event listener for Enter key on title input
+    document.getElementById('customTitle').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            updatePageTitle();
+        }
+    });
+}
+
+function updatePageTitle() {
+    const customTitle = document.getElementById('customTitle').value.trim();
+    
+    if (!customTitle) {
+        alert('Please enter a custom title.');
+        return;
+    }
+    
+    // Use file date if available, otherwise use current date
+    const dateToUse = fileDate || new Date();
+    const formattedDate = dateToUse.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Update the page title
+    document.title = `${customTitle} - ${formattedDate}`;
+    
+    // Update the main heading
+    const mainHeading = document.querySelector('header h1');
+    mainHeading.textContent = customTitle;
+    
+    // Update the subtitle with date
+    const subtitle = document.querySelector('header p');
+    subtitle.textContent = `Ice depth measurements across a 200' x 85' hockey rink - ${formattedDate}`;
+    
+    // Show success feedback
+    showTitleUpdateFeedback();
+}
+
+function showTitleUpdateFeedback() {
+    const button = document.getElementById('updateTitleBtn');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Title Updated!';
+    button.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+    
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+    }, 2000);
+}
 
 function showFileIndicator(fileName, stats, status = 'active') {
     const fileIndicator = document.getElementById('fileIndicator');
@@ -147,6 +217,12 @@ function processFile(file) {
 
     // Store the file name globally
     csvFileName = file.name;
+    
+    // Extract date from file (use file modification date as fallback)
+    fileDate = new Date(file.lastModified);
+    
+    // Update page title with file date
+    updatePageTitleWithFileDate();
 
     showLoading('Processing uploaded file...');
     showFileIndicator(file.name, 'Processing...', 'loading');
@@ -181,6 +257,27 @@ function processFile(file) {
         };
         reader.readAsArrayBuffer(file);
     }
+}
+
+function updatePageTitleWithFileDate() {
+    const customTitle = document.getElementById('customTitle').value.trim() || 'Hockey Rink Ice Depth Analysis';
+    const formattedDate = fileDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Update the page title
+    document.title = `${customTitle} - ${formattedDate}`;
+    
+    // Update the main heading
+    const mainHeading = document.querySelector('header h1');
+    mainHeading.textContent = customTitle;
+    
+    // Update the subtitle with date
+    const subtitle = document.querySelector('header p');
+    subtitle.textContent = `Ice depth measurements across a 200' x 85' hockey rink - ${formattedDate}`;
 }
 
 function processDataSuccess() {
@@ -394,10 +491,17 @@ function showDebugInfo(info) {
     const debugSection = document.getElementById('debugSection');
     const debugInfo = document.getElementById('debugInfo');
     
+    const fileDateStr = fileDate ? fileDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    }) : 'Not available';
+    
     debugInfo.innerHTML = `
         <p><strong>Data File:</strong> ${info.csvData ? 'Loaded' : 'Not loaded'}</p>
         <p><strong>File Name:</strong> ${info.csvData ? csvFileName : 'No file uploaded'}</p>
         <p><strong>File Type:</strong> ${info.csvData ? (csvFileName.toLowerCase().endsWith('.csv') ? 'CSV' : 'Excel') : 'None'}</p>
+        <p><strong>File Date:</strong> ${fileDateStr}</p>
         <p><strong>Sheet Average:</strong> ${info.sheetAverage ? info.sheetAverage.toFixed(2) + ' inches' : 'Not calculated'}</p>
         <p><strong>Data Points:</strong> ${info.dataPoints || 0}</p>
         <p><strong>Heat Map Points:</strong> ${info.heatMapPoints || 0}</p>
@@ -727,6 +831,18 @@ function createHockeyRinkHeatMap(data, xCol, yCol, valueCol) {
     Plotly.newPlot(chartContainer, [trace], layout, config).then(() => {
         console.log('Plotly chart created successfully');
         
+        // Create download button
+        const visualizationSection = document.getElementById('visualizationSection');
+        const existingDownloadBtn = visualizationSection.querySelector('.download-btn');
+        if (!existingDownloadBtn) {
+            const downloadBtn = document.createElement('button');
+            downloadBtn.textContent = 'Download Heat Map';
+            downloadBtn.className = 'upload-btn download-btn';
+            downloadBtn.style.marginTop = '20px';
+            downloadBtn.onclick = downloadHeatMap;
+            visualizationSection.appendChild(downloadBtn);
+        }
+        
         // Update debug info with chart creation status and heat map points count
         if (debugInfo) {
             let updatedHtml = debugInfo.innerHTML;
@@ -951,27 +1067,29 @@ function downloadHeatMap() {
             height: 600
         }).then(function(dataUrl) {
             const link = document.createElement('a');
-            link.download = 'hockey-rink-ice-depth-heatmap.png';
+            
+            // Get custom title and file date for filename
+            const customTitle = document.getElementById('customTitle').value.trim();
+            
+            // Create filename with custom title and file date
+            let filename = 'hockey-rink-ice-depth-heatmap';
+            if (customTitle) {
+                // Clean title for filename (remove special characters, replace spaces with dashes)
+                const cleanTitle = customTitle.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+                filename = cleanTitle;
+            }
+            if (fileDate) {
+                const dateStr = fileDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+                filename += `-${dateStr}`;
+            }
+            filename += '.png';
+            
+            link.download = filename;
             link.href = dataUrl;
             link.click();
         });
     }
 }
-
-// Add download button functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize event listeners
-    initializeEventListeners();
-    
-    // Add download button after chart is created
-    const downloadBtn = document.createElement('button');
-    downloadBtn.textContent = 'Download Heat Map';
-    downloadBtn.className = 'upload-btn download-btn';
-    downloadBtn.style.marginTop = '20px';
-    downloadBtn.onclick = downloadHeatMap;
-    
-    document.getElementById('visualizationSection').appendChild(downloadBtn);
-});
 
 function showError(message) {
     // Create error message element
