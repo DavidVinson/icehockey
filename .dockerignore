@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+package-lock.json
+
+# Development files
+*.log
+.DS_Store
+.vscode
+.idea
+
+# Fly.io
+fly.toml
+.fly
+
+# Documentation
+README.md
+
+# Temporary files
+*.tmp
+*.temp 
