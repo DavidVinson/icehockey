@@ -49,6 +49,39 @@ python3 -m http.server 8000
 
 4. Open your browser and go to `http://localhost:8000`
 
+### Deployment
+
+This app is deployed on Fly.io at: **https://hockey-rink-heatmap.fly.dev/**
+
+#### Updating the Deployed App
+
+To update the live app after making changes:
+
+1. **Set up Fly.io CLI** (if not already done):
+   ```bash
+   # Add flyctl to PATH (if installed manually)
+   export PATH="$HOME/.fly/bin:$PATH"
+   
+   # Login to Fly.io
+   flyctl auth login
+   ```
+
+2. **Deploy updates**:
+   ```bash
+   flyctl deploy
+   ```
+
+3. **Alternative using npm scripts**:
+   ```bash
+   # Add flyctl to PATH first
+   export PATH="$HOME/.fly/bin:$PATH"
+   
+   # Then deploy
+   npm run deploy
+   ```
+
+**Note**: Make sure to add `export PATH="$HOME/.fly/bin:$PATH"` to your shell profile (`.zshrc`, `.bash_profile`, etc.) to avoid having to set it each time.
+
 ## Supported File Formats
 
 The application supports the following file formats:
